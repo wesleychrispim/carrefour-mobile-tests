@@ -1,0 +1,5 @@
+[
+  { "name": "valido", "email": "demo@wdio.app", "password": "wdiodemo1", "expect": "success" },
+  { "name": "email_invalido", "email": "demo", "password": "wdiodemo1", "expect": "email" },
+  { "name": "senha_curta", "email": "demo@wdio.app", "password": "12345", "expect": "password" }
+]

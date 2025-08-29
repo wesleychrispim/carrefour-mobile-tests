@@ -1,0 +1,10 @@
+node_modules/
+reports/
+allure-results/
+allure-report/
+coverage/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+apps/*.apk
