@@ -1,8 +1,4 @@
-// Rodar no BrowserStack App Automate (iOS)
-// Requer env vars: BROWSERSTACK_USERNAME e BROWSERSTACK_ACCESS_KEY
-// E o ID do app enviado para o BS: BS_IOS_APP (e.g. bs://<hash>)
-// Upload do app: curl -u "USER:KEY" -X POST "https://api-cloud.browserstack.com/app-automate/upload" -F "file=@/path/app.ipa"
-
+// wdio.bs.ios.conf.js
 const buildName = process.env.BUILD_NAME || `Mobile iOS - ${new Date().toISOString().slice(0,10)}`
 const bsUser = process.env.BROWSERSTACK_USERNAME
 const bsKey = process.env.BROWSERSTACK_ACCESS_KEY
@@ -17,13 +13,13 @@ const config = {
   key: bsKey,
 
   runner: 'local',
-  specs: ['./src/specs/**/*.spec.js'], // você pode filtrar por arquivo para iOS
+  specs: ['./src/specs/**/*.spec.js'],
   maxInstances: 1,
   logLevel: 'info',
   framework: 'mocha',
   mochaOpts: { timeout: 240000 },
 
-  services: [], // não usa appium local no BS
+  services: [], // no BS não usa appium local
 
   reporters: [
     'spec',
@@ -44,7 +40,7 @@ const config = {
     'appium:automationName': 'XCUITest',
     'appium:deviceName': process.env.IOS_DEVICE || 'iPhone 15',
     'appium:platformVersion': process.env.IOS_VERSION || '17',
-    'appium:app': bsAppId || 'bs://YOUR_APP_ID', // defina BS_IOS_APP no ambiente
+    'appium:app': bsAppId || 'bs://YOUR_APP_ID',
     'appium:newCommandTimeout': 180,
     'bstack:options': {
       projectName: 'Carrefour Mobile',

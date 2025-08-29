@@ -2,10 +2,8 @@ const { join } = require('path')
 
 const config = {
   runner: 'local',
-
   specs: ['./src/specs/**/*.spec.js'],
   maxInstances: 1,
-
   logLevel: 'info',
   framework: 'mocha',
   mochaOpts: { timeout: 180000 }, // 3 min
@@ -19,7 +17,8 @@ const config = {
     }]
   ],
 
-  services: ['appium'],
+  // Appium 2 via service (basePath '/')
+  services: [['appium', { args: { basePath: '/' }, loglevel: 'warn' }]],
 
   capabilities: [{
     platformName: 'Android',
@@ -27,7 +26,6 @@ const config = {
     'appium:deviceName': process.env.WDIO_DEVICE || 'emulator-5554',
     'appium:udid': process.env.WDIO_UDID || 'emulator-5554',
     'appium:app': join(process.cwd(), 'app/android/NativeDemoApp.apk'),
-    // Se seu arquivo tiver outro nome, ajuste a linha acima (ex.: android.wdio.native.app.v1.0.8.apk)
     'appium:autoGrantPermissions': true,
     'appium:newCommandTimeout': 180
   }],
