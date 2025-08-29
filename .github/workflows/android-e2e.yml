@@ -27,15 +27,15 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
+          # cache: 'npm'  # (desligado enquanto não há package-lock.json)
 
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
 
-      - name: Install deps
-        run: npm ci
+      - name: Install deps (no lockfile)
+        run: npm install --no-audit --prefer-offline
 
       - name: Install Appium UiAutomator2 driver
         run: npx appium driver install uiautomator2
@@ -57,7 +57,7 @@ jobs:
         with:
           name: allure-results-android
           path: reports/allure-results/**
-          if-no-files-found: warn
+          if-no-files-found: ignore
 
       - name: Upload raw reports (screens, logs)
         if: always()
@@ -68,7 +68,7 @@ jobs:
           if-no-files-found: ignore
 
   ios-bs:
-    name: iOS (BrowserStack)  # opcional — comente este job se não for usar
+    name: iOS (BrowserStack)  # opcional — remova este job se não usar BS
     runs-on: ubuntu-latest
     needs: android
     env:
@@ -82,10 +82,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
 
       - name: Install deps
-        run: npm ci
+        run: npm install --no-audit --prefer-offline
 
       - name: Run WDIO on BrowserStack iOS
         run: npx wdio run ./wdio.bs.ios.conf.js
@@ -96,12 +95,12 @@ jobs:
         with:
           name: allure-results-ios
           path: reports/allure-results/**
-          if-no-files-found: warn
+          if-no-files-found: ignore
 
   build-allure:
     name: Build Allure (merge Android + iOS)
     runs-on: ubuntu-latest
-    needs: [android, ios-bs]   # se não usar iOS, pode deixar só: needs: android
+    needs: [android, ios-bs]   # se não usar iOS, troque para: needs: android
     if: always()
 
     steps:
@@ -110,6 +109,7 @@ jobs:
         with:
           name: allure-results-android
           path: ./allure-results/android
+        continue-on-error: true
 
       - name: Download allure-results iOS (se existir)
         uses: actions/download-artifact@v4
@@ -130,9 +130,18 @@ jobs:
       - name: Merge results e gerar Allure
         run: |
           mkdir -p merged-results
-          find allure-results -type f -name '*.json' -exec cp {} merged-results \; || true
-          find allure-results -type f -name '*.xml' -exec cp {} merged-results \; || true
-          npx --yes allure-commandline generate merged-results --clean -o allure-report
+          [ -d "allure-results/android" ] && cp -r allure-results/android/* merged-results/ || true
+          [ -d "allure-results/ios" ] && cp -r allure-results/ios/* merged-results/ || true
+          if [ -d "merged-results" ] && [ "$(ls -A merged-results 2>/dev/null)" ]; then
+            npx --yes allure-commandline generate merged-results --clean -o allure-report
+          else
+            mkdir -p allure-report
+            cat > allure-report/index.html <<'HTML'
+            <html><body><h2>Sem resultados do Allure</h2>
+            <p>O job anterior não gerou <code>allure-results</code>. Verifique os logs do job Android.</p>
+            </body></html>
+            HTML
+          fi
 
       - name: Upload Pages artifact (Allure)
         uses: actions/upload-pages-artifact@v3
