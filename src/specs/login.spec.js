@@ -19,14 +19,11 @@ describe('Login', () => {
     await LoginPage.confirmAlert()
   })
 
-  // data-driven para negativos (email inválido, senha curta)
   data
     .filter(t => t.expect !== 'success')
     .forEach(tc => {
       it(`deve validar erro de ${tc.name}`, async () => {
         await LoginPage.login(tc.email, tc.password)
-
-        // primeiro tenta inline; se não houver, cai pro alerta (compatibilidade)
         if (tc.expect === 'email') {
           if (await LoginPage.hasInlineEmailError()) {
             expect(await LoginPage.hasInlineEmailError()).to.equal(true)

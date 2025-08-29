@@ -1,18 +1,14 @@
 class LoginPage {
-  // Navegação
   get tabLogin() { return $('~Login') }
 
-  // Login
   get inputEmail() { return $('~input-email') }
   get inputPassword() { return $('~input-password') }
   get btnLogin() { return $('~button-LOGIN') }
 
-  // Alert
   get alertTitle() { return $('id=android:id/alertTitle') }
   get alertMessage() { return $('id=android:id/message') }
   get alertOk() { return $('id=android:id/button1') }
 
-  // Inline errors
   get inlineEmailError() {
     return $('android=new UiSelector().textContains("valid email address")')
   }
@@ -20,7 +16,6 @@ class LoginPage {
     return $('android=new UiSelector().textContains("at least 8")')
   }
 
-  // Sign up
   get tabSignup() { return $('android=new UiSelector().textContains("Sign up")') }
   get suInputName() { return $('~input-name') }
   get suInputEmail() { return $('~input-email') }
@@ -66,7 +61,6 @@ class LoginPage {
     catch { return false }
   }
 
-  // SIGN UP
   async openSignup() {
     await this.openLogin()
     await this.tabSignup.waitForDisplayed({ timeout: 10000 })
@@ -74,7 +68,7 @@ class LoginPage {
   }
 
   async signup(name, email, password) {
-    const edits = await $$('android.widget.EditText') // fallback
+    const edits = await $$('android.widget.EditText')
     if (await this.suInputName.isExisting()) await this.suInputName.setValue(name)
     else if (edits[0]) await edits[0].setValue(name)
 

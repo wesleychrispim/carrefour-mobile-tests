@@ -2,7 +2,6 @@ class DragPage {
   get tab() { return $('~Drag') }
 
   async open() {
-    // garante voltar pra home se estiver em tela interna
     for (let i = 0; i < 3; i++) {
       if (await this.tab.isExisting()) break
       await driver.back(); await driver.pause(200)
@@ -11,7 +10,6 @@ class DragPage {
     await this.tab.click()
   }
 
-  // ---- Gestos inline (sem utils externos) ----
   async dragElementToElement(sourceEl, targetEl, hold = 150, move = 250) {
     const s = await sourceEl.getRect()
     const t = await targetEl.getRect()
@@ -51,12 +49,7 @@ class DragPage {
     await driver.releaseActions()
   }
 
-  /**
-   * Tenta identificar um par source/target por múltiplas estratégias.
-   * Retorna { source, target } ou null.
-   */
   async resolveSourceTarget() {
-    // 1) accessibility ids comuns em builds do demo-app
     const srcAcc = await $('~drag-l1').catch(() => null)
     const tgtAcc = await $('~drop-r1').catch(() => null)
     if (srcAcc && await srcAcc.isExisting().catch(() => false) &&
@@ -64,7 +57,6 @@ class DragPage {
       return { source: srcAcc, target: tgtAcc }
     }
 
-    // 2) por texto "Drag" / "Drop"
     const srcTxt = await $('android=new UiSelector().textContains("Drag")').catch(() => null)
     const tgtTxt = await $('android=new UiSelector().textContains("Drop")').catch(() => null)
     if (srcTxt && await srcTxt.isExisting().catch(() => false) &&
@@ -72,7 +64,6 @@ class DragPage {
       return { source: srcTxt, target: tgtTxt }
     }
 
-    // 3) fallback estrutural: pega dois blocos clicáveis
     const blocks = await $$('//android.view.ViewGroup[.//android.view.View or .//android.widget.TextView]')
     if (blocks && blocks.length >= 2) {
       return { source: blocks[0], target: blocks[blocks.length - 1] }
@@ -81,11 +72,6 @@ class DragPage {
     return null
   }
 
-  /**
-   * Executa um drag & drop uma vez.
-   * - Garante que source/target são elementos (têm getRect)
-   * - Se não achar, usa fallback por coordenadas
-   */
   async dragOnce() {
     const pair = await this.resolveSourceTarget()
     if (pair && pair.source && pair.target) {
@@ -95,7 +81,6 @@ class DragPage {
       }
     }
 
-    // Fallback por coordenadas (30% -> 70% da largura no meio da tela)
     const { width, height } = await driver.getWindowRect()
     const y  = Math.floor(height * 0.5)
     const x1 = Math.floor(width  * 0.30)

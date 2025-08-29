@@ -35,7 +35,6 @@ describe('Forms', () => {
     expect(kind, 'Esperava feedback de alerta/toast').to.be.oneOf(['alert', 'toast', 'loose'])
 
     const t = (await FormsPage.feedbackText()).toLowerCase()
-    // para o demo app, o comportamento típico é o alerta "This button is active"
     expect(t).to.satisfy(s =>
       s.includes('this button is active') ||
       s.includes('enter') ||
